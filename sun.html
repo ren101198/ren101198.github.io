@@ -30,19 +30,18 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
 <body>
 <div class="container">
 <h1>今天要吃什麼？</h1>
-<div class="small">選擇「餐廳類型」</div>
+<div class="small">選擇「類型」</div>
 
 
-<label style="margin-top:16px;display:block">選擇餐廳類型</label>
+<label style="margin-top:16px;display:block">選擇類型</label>
 <select id="type">
 <option disabled selected value="">請選擇</option>
-<option>中式餐廳</option>
-<option>日式料理</option>
-<option>韓式料理</option>
-<option>美式餐廳</option>
-<option>火鍋店</option>
-<option>燒烤/烤肉店</option>
-<option>速食店</option>
+<option>中式</option>
+<option>日式</option>
+<option>韓式</option>
+<option>美式</option>
+<option>火鍋</option>
+<option>速食</option>
 <option>便利商店</option>
 <option>福利社</option>
 </select>
@@ -63,16 +62,15 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
 
 <script>
 const foods = {
-"中式餐廳": ["牛肉麵","宮保雞丁","水餃","麻婆豆腐","三杯雞","炒飯"],
-"日式料理": ["壽司","拉麵","炸豬排","咖哩飯","照燒雞","烏龍麵"],
-"韓式料理": ["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
-"美式餐廳": ["漢堡","牛排","辣雞翅","凱薩沙拉","披薩"],
-"火鍋店": ["麻辣鍋","鴛鴦鍋","海鮮火鍋","牛肉拼盤","蔬菜盤"],
-"燒烤/烤肉店": ["烤牛五花","烤豬五花","烤雞腿排","烤蝦","烤蔬菜"],
-"速食店": ["炸雞","薯條","漢堡","雞塊","可樂","冰炫風"],
-"便利商店": ["御飯糰","便當","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
-"店家": ["珍珠奶茶","紅茶拿鐵","青茶","水果茶","奶蓋綠茶","芒果冰沙","多多綠"],
-"福利社": ["便當","泡麵","關東煮","義大利麵","茶葉蛋"]
+"中式": ["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
+"日式": ["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
+"韓式": ["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
+"小點心": ["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
+"火鍋店": ["這一小鍋","石二鍋","老先覺","老上海","三媽"],
+"速食店": ["肯德基","麥當勞","漢堡王","摩斯漢堡"],
+"便利商店": ["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
+"飲料": ["麻古","八曜","50嵐","一沐日","鶴茶樓","可不可","五桐號"],
+"福利社": ["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
 };
 
 
@@ -105,7 +103,7 @@ function saveFavs(){ localStorage.setItem("favFoods",JSON.stringify(favorites));
 
 document.getElementById("decideBtn").onclick = ()=>{
 const t = document.getElementById("type").value;
-if(!t){ resultEl.textContent = "請先選擇餐廳類型"; return; }
+if(!t){ resultEl.textContent = "請先選擇類型"; return; }
 const list = foods[t];
 const pick = list[Math.floor(Math.random()*list.length)];
 
