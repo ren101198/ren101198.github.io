@@ -27,31 +27,33 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
 .resultBox{margin-top:16px;padding:16px;border-radius:10px;background:#fff3e6;border:1px solid #ffd8bd}
 </style>
 </head>
+
 <body>
 <div class="container">
 <h1>今天要吃什麼？</h1>
-<div class="small">選擇「肚子多餓」與「類型」</div>
+<div class="small">先選肚子餓的程度，再選類型</div>
 
-<!-- 新增肚子餓程度 -->
+<!-- 肚子餓程度 -->
 <label style="margin-top:16px;display:block">今天肚子有多餓？</label>
 <select id="hungry">
-<option disabled selected value="">請選擇</option>
-<option>不太餓</option>
-<option>普通</option>
-<option>超級餓</option>
+  <option disabled selected value="">請選擇</option>
+  <option>不太餓</option>
+  <option>普通</option>
+  <option>超級餓</option>
 </select>
 
+<!-- 類型 -->
 <label style="margin-top:16px;display:block">選擇類型</label>
 <select id="type">
-<option disabled selected value="">請選擇</option>
-<option>中式</option>
-<option>日式</option>
-<option>韓式</option>
-<option>小點心</option>
-<option>火鍋</option>
-<option>速食</option>
-<option>便利商店</option>
-<option>福利社</option>
+  <option disabled selected value="">請選擇</option>
+  <option>中式</option>
+  <option>日式</option>
+  <option>韓式</option>
+  <option>小點心</option>
+  <option>火鍋</option>
+  <option>速食</option>
+  <option>便利商店</option>
+  <option>福利社</option>
 </select>
 
 <button class="btn" id="decideBtn">決定要吃什麼！</button>
@@ -66,107 +68,86 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
 
 <script>
 const foods = {
-"中式": ["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
-"日式": ["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
-"韓式": ["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
-"小點心": ["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
-"火鍋": ["這一小鍋","石二鍋","老先覺","老上海","三媽"],
-"速食": ["肯德基","麥當勞","漢堡王","摩斯漢堡"],
-"便利商店": ["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
-"飲料": ["麻古","八曜","50嵐","一沐日","鶴茶樓","可不可","五桐號"],
-"福利社": ["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
+  "中式": ["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
+  "日式": ["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
+  "韓式": ["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
+  "小點心": ["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
+  "火鍋": ["這一小鍋","石二鍋","老先覺","老上海","三媽"],
+  "速食": ["肯德基","麥當勞","漢堡王","摩斯漢堡"],
+  "便利商店": ["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
+  "福利社": ["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
 };
 
-let favorites = JSON.parse(localStorage.getItem("favFoods") || "[]");
-
+const hungrySelect = document.getElementById("hungry");
+const typeSelect = document.getElementById("type");
+const decideBtn = document.getElementById("decideBtn");
 const resultEl = document.getElementById("result");
 const favListEl = document.getElementById("favList");
 
-function renderFavs(){
-if(favorites.length===0){favListEl.textContent = "尚無收藏";return;}
-favListEl.innerHTML = "";
-favorites.forEach((f,i)=>{
-const d=document.createElement('div');
-d.className='item';
-d.textContent=f;
-const btn=document.createElement('button');
-btn.textContent='移除';
-btn.className='favBtn';
-btn.onclick=()=>{favorites.splice(i,1);saveFavs();renderFavs()};
-d.appendChild(btn);
-favListEl.appendChild(d);
-})
-}
+// 記錄所有類型
+const allTypes = Object.keys(foods);
+const lightTypes = ["小點心","速食","便利商店","福利社"];
 
-function saveFavs(){ localStorage.setItem("favFoods",JSON.stringify(favorites)); }
+// 收藏
+let favorites = JSON.parse(localStorage.getItem("favFoods") || "[]");
 
-document.getElementById("decideBtn").onclick = ()=>{
-const hungry = document.getElementById("hungry").value;
-const t = document.getElementById("type").value;
-
-if(!hungry){
-    resultEl.textContent = "請先選擇肚子有多餓";
-    return;
-}
-
-let chosenType = t;
-
-// 若肚子不太餓 → 限定類型
-if(hungry === "不太餓"){
-    const lightTypes = ["小點心", "速食", "便利商店", "福利社"];
-
-    // 如果使用者原本選的類型不在限定清單 → 強制切換
-    if(!lightTypes.includes(t)){
-        // 自動挑一個適合的類型
-        chosenType = lightTypes[Math.floor(Math.random()*lightTypes.length)];
-    }
-}
-
-if(!chosenType){
-    resultEl.textContent = "請先選擇類型";
-    return;
-}
-
-const list = foods[chosenType];
-const pick = list[Math.floor(Math.random()*list.length)];
-
-resultEl.innerHTML = `<strong>${pick}</strong><br><button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
-};
-
-window.addFav = (name)=>{
-if(!favorites.includes(name)) favorites.push(name);
-saveFavs();
-renderFavs();
-}
-const hungrySelect = document.getElementById("hungry");
-const typeSelect = document.getElementById("type");
-
-// 保存原本所有類型選項
-const allTypeOptions = Array.from(typeSelect.options).map(o => o.text);
-
-// 不太餓時允許的類型
-const lightTypes = ["小點心", "速食", "便利商店", "福利社"];
-
+// 依肚子餓程度調整類型選單
 hungrySelect.addEventListener("change", () => {
   const hungry = hungrySelect.value;
-
-  // 清空類型選單
   typeSelect.innerHTML = `<option disabled selected value="">請選擇</option>`;
 
-  let typesToShow;
+  let showTypes = hungry === "不太餓" ? lightTypes : allTypes;
 
-  if (hungry === "不太餓") {
-    typesToShow = lightTypes;
-  } else {
-    typesToShow = allTypeOptions.filter(t => t !== "請選擇");
-  }
-
-  typesToShow.forEach(t => {
+  showTypes.forEach(t => {
     const opt = document.createElement("option");
     opt.textContent = t;
     typeSelect.appendChild(opt);
   });
 });
+
+// 決定食物
+decideBtn.onclick = () => {
+  const t = typeSelect.value;
+  if (!t) {
+    resultEl.textContent = "請先選擇類型";
+    return;
+  }
+  const list = foods[t];
+  const pick = list[Math.floor(Math.random() * list.length)];
+  resultEl.innerHTML = `<strong>${pick}</strong><br>
+    <button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
+};
+
+// 收藏功能
+function renderFavs(){
+  if (favorites.length === 0) {
+    favListEl.textContent = "尚無收藏";
+    return;
+  }
+  favListEl.innerHTML = "";
+  favorites.forEach((f,i)=>{
+    const d = document.createElement("div");
+    d.className = "item";
+    d.textContent = f;
+    const btn = document.createElement("button");
+    btn.textContent = "移除";
+    btn.className = "favBtn";
+    btn.onclick = ()=>{favorites.splice(i,1);saveFavs();renderFavs();}
+    d.appendChild(btn);
+    favListEl.appendChild(d);
+  });
+}
+
+function saveFavs(){
+  localStorage.setItem("favFoods", JSON.stringify(favorites));
+}
+
+window.addFav = (name)=>{
+  if(!favorites.includes(name)) favorites.push(name);
+  saveFavs();
+  renderFavs();
+}
+
 renderFavs();
 </script>
 </body>
