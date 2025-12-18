@@ -176,7 +176,7 @@ const foods={
   "中式":["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
   "日式":["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
   "韓式":["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
-  "小點心":"蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
+  "小點心":["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
   "火鍋":["這一小鍋","石二鍋","老先覺","老上海","三媽"],
   "速食":["肯德基","麥當勞","漢堡王","摩斯漢堡"],
   "便利商店":["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
@@ -195,7 +195,7 @@ const lightTypes=["小點心","速食","便利商店","福利社"];
 let favorites=JSON.parse(localStorage.getItem("favFoods")||"[]");
 
 function renderTypes(list){
-  type.innerHTML=`<option disabled selected value="">請選擇</option>`;
+  type.innerHTML=<option disabled selected value="">請選擇</option>;
   list.forEach(t=>{
     const o=document.createElement("option");
     o.textContent=t;
@@ -218,7 +218,7 @@ document.getElementById("decideBtn").onclick=()=>{
   }
   const list=foods[type.value];
   const pick=list[Math.floor(Math.random()*list.length)];
-  result.innerHTML=`😋 ${pick}<br><button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
+  result.innerHTML=😋 ${pick}<br><button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>;
   result.classList.remove("fade");
   void result.offsetWidth;
   result.classList.add("fade");
