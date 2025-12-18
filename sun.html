@@ -21,9 +21,6 @@ h1{margin:0 0 8px 0;font-size:22px;font-weight:700}
 .small{font-size:13px;color:#666}
 select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margin-top:8px}
 .btn{margin-top:12px;width:100%;padding:10px;border:0;border-radius:10px;background:#ff7a59;color:white;font-size:16px;cursor:pointer}
-.card{margin-top:16px;padding:16px;border-radius:10px;background:#fff7ef;border:1px solid #ffe4d6}
-.item{padding:10px;border-radius:8px;border:1px solid #eee;margin-top:8px;background:#fff}
-.favBtn{margin-left:10px;font-size:14px;padding:4px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
 .resultBox{margin-top:16px;padding:16px;border-radius:10px;background:#fff3e6;border:1px solid #ffd8bd}
 </style>
 </head>
@@ -31,9 +28,7 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
 <body>
 <div class="container">
 <h1>今天要吃什麼？</h1>
-<div class="small">先選肚子餓的程度，再選類型</div>
 
-<!-- 肚子餓程度 -->
 <label style="margin-top:16px;display:block">今天肚子有多餓？</label>
 <select id="hungry">
   <option disabled selected value="">請選擇</option>
@@ -42,113 +37,64 @@ select{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;margi
   <option>超級餓</option>
 </select>
 
-<!-- 類型 -->
 <label style="margin-top:16px;display:block">選擇類型</label>
 <select id="type">
   <option disabled selected value="">請選擇</option>
-  <option>中式</option>
-  <option>日式</option>
-  <option>韓式</option>
-  <option>小點心</option>
-  <option>火鍋</option>
-  <option>速食</option>
-  <option>便利商店</option>
-  <option>福利社</option>
 </select>
 
 <button class="btn" id="decideBtn">決定要吃什麼！</button>
-
 <div id="result" class="resultBox small">尚未選擇</div>
-
-<div class="card">
-<strong>收藏清單</strong>
-<div id="favList" class="small" style="margin-top:8px">尚無收藏</div>
-</div>
 </div>
 
 <script>
 const foods = {
-  "中式": ["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
-  "日式": ["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
-  "韓式": ["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
-  "小點心": ["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
-  "火鍋": ["這一小鍋","石二鍋","老先覺","老上海","三媽"],
-  "速食": ["肯德基","麥當勞","漢堡王","摩斯漢堡"],
-  "便利商店": ["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
-  "福利社": ["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
+  "中式": ["便當","炒飯","陽春麵"],
+  "日式": ["壽司","拉麵","丼飯"],
+  "韓式": ["石鍋拌飯","韓式炸雞"],
+  "小點心": ["蔥抓餅","地瓜球","鬆餅"],
+  "火鍋": ["石二鍋","三媽"],
+  "速食": ["麥當勞","肯德基"],
+  "便利商店": ["御飯糰","關東煮","泡麵"],
+  "福利社": ["便當","泡麵","茶葉蛋"]
 };
 
 const hungrySelect = document.getElementById("hungry");
 const typeSelect = document.getElementById("type");
-const decideBtn = document.getElementById("decideBtn");
 const resultEl = document.getElementById("result");
-const favListEl = document.getElementById("favList");
 
-// 記錄所有類型
+// 所有類型
 const allTypes = Object.keys(foods);
+// 不太餓限定
 const lightTypes = ["小點心","速食","便利商店","福利社"];
 
-// 收藏
-let favorites = JSON.parse(localStorage.getItem("favFoods") || "[]");
-
-// 依肚子餓程度調整類型選單
-hungrySelect.addEventListener("change", () => {
-  const hungry = hungrySelect.value;
+// 初始化類型選單（顯示全部）
+function renderTypes(types){
   typeSelect.innerHTML = `<option disabled selected value="">請選擇</option>`;
-
-  let showTypes = hungry === "不太餓" ? lightTypes : allTypes;
-
-  showTypes.forEach(t => {
-    const opt = document.createElement("option");
-    opt.textContent = t;
+  types.forEach(t=>{
+    const opt=document.createElement("option");
+    opt.textContent=t;
     typeSelect.appendChild(opt);
   });
+}
+renderTypes(allTypes);
+
+// 肚子餓程度改變時 → 直接改選單內容
+hungrySelect.addEventListener("change",()=>{
+  if(hungrySelect.value==="不太餓"){
+    renderTypes(lightTypes);
+  }else{
+    renderTypes(allTypes);
+  }
 });
 
-// 決定食物
-decideBtn.onclick = () => {
-  const t = typeSelect.value;
-  if (!t) {
-    resultEl.textContent = "請先選擇類型";
-    return;
-  }
-  const list = foods[t];
-  const pick = list[Math.floor(Math.random() * list.length)];
-  resultEl.innerHTML = `<strong>${pick}</strong><br>
-    <button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
+// 抽食物
+document.getElementById("decideBtn").onclick=()=>{
+  const t=typeSelect.value;
+  if(!t){resultEl.textContent="請先選擇類型";return;}
+  const list=foods[t];
+  const pick=list[Math.floor(Math.random()*list.length)];
+  resultEl.innerHTML=`<strong>${pick}</strong>`;
 };
-
-// 收藏功能
-function renderFavs(){
-  if (favorites.length === 0) {
-    favListEl.textContent = "尚無收藏";
-    return;
-  }
-  favListEl.innerHTML = "";
-  favorites.forEach((f,i)=>{
-    const d = document.createElement("div");
-    d.className = "item";
-    d.textContent = f;
-    const btn = document.createElement("button");
-    btn.textContent = "移除";
-    btn.className = "favBtn";
-    btn.onclick = ()=>{favorites.splice(i,1);saveFavs();renderFavs();}
-    d.appendChild(btn);
-    favListEl.appendChild(d);
-  });
-}
-
-function saveFavs(){
-  localStorage.setItem("favFoods", JSON.stringify(favorites));
-}
-
-window.addFav = (name)=>{
-  if(!favorites.includes(name)) favorites.push(name);
-  saveFavs();
-  renderFavs();
-}
-
-renderFavs();
 </script>
 </body>
 </html>
