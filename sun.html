@@ -13,7 +13,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>今天要吃什麼？</title>
+<title>吃吃吃</title>
+<link rel="icon" href="sun.png">
 
 <style>
 :root{
@@ -40,24 +41,10 @@ body{
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
-h1{
-  margin:0;
-  text-align:center;
-  font-size:24px;
-}
+h1{text-align:center;margin:0;font-size:24px}
+.subtitle{text-align:center;font-size:13px;color:#666;margin-top:6px}
 
-.subtitle{
-  text-align:center;
-  font-size:13px;
-  color:#666;
-  margin-top:6px;
-}
-
-label{
-  display:block;
-  margin-top:22px;
-  font-weight:600;
-}
+label{display:block;margin-top:22px;font-weight:600}
 
 select{
   width:100%;
@@ -66,12 +53,6 @@ select{
   border-radius:14px;
   border:1px solid var(--border);
   background:var(--soft);
-  font-size:15px;
-}
-
-select:focus{
-  outline:none;
-  border-color:var(--main);
 }
 
 .btn{
@@ -85,12 +66,6 @@ select:focus{
   font-size:17px;
   font-weight:700;
   cursor:pointer;
-  box-shadow:0 6px 0 #e56648;
-}
-
-.btn:active{
-  transform:translateY(2px);
-  box-shadow:0 4px 0 #e56648;
 }
 
 .result{
@@ -100,17 +75,20 @@ select:focus{
   background:var(--soft);
   border:1px dashed var(--border);
   text-align:center;
-  font-size:18px;
-  font-weight:700;
 }
 
-.fade{
-  animation:fadeIn .35s ease;
+.result img{
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-bottom:10px;
 }
 
+.fade{animation:fadeIn .3s ease}
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(6px)}
-  to{opacity:1;transform:none}
+  to{opacity:1}
 }
 
 .card{
@@ -128,8 +106,6 @@ select:focus{
   background:var(--soft);
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  font-size:14px;
 }
 
 .favBtn{
@@ -167,7 +143,7 @@ select:focus{
 
   <div class="card">
     <strong>⭐ 收藏清單</strong>
-    <div id="favList" style="margin-top:8px;font-size:13px;color:#666">尚無收藏</div>
+    <div id="favList" style="font-size:13px;color:#666">尚無收藏</div>
   </div>
 </div>
 
@@ -176,12 +152,24 @@ const foods={
   "中式":["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
   "日式":["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
   "韓式":["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
-  "小點心":["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
+  "小點心":["蔥抓餅","地瓜球","鬆餅","肉圓"],
   "火鍋":["這一小鍋","石二鍋","老先覺","老上海","三媽"],
   "速食":["肯德基","麥當勞","漢堡王","摩斯漢堡"],
   "便利商店":["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
   "飲料": ["麻古","八曜","50嵐","一沐日","鶴茶樓","可不可","五桐號"],
-  "福利社":["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
+  "福利社":["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]]
+};
+
+// 類型對應圖片
+const typeImg={
+  "中式":"https://images.unsplash.com/photo-1604908177522-429d6cfd6e64",
+  "日式":"https://images.unsplash.com/photo-1546069901-eacef0df6022",
+  "韓式":"https://images.unsplash.com/photo-1604908812566-31c8d4dca1fd",
+  "小點心":"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0",
+  "火鍋":"https://images.unsplash.com/photo-1585032226651-759b368d7246",
+  "速食":"https://images.unsplash.com/photo-1550547660-d9450f859349",
+  "便利商店":"https://images.unsplash.com/photo-1604909053191-04f61b2f10d4",
+  "福利社":"https://images.unsplash.com/photo-1504674900247-0877df9cc836"
 };
 
 const hungry=document.getElementById("hungry");
@@ -189,13 +177,13 @@ const type=document.getElementById("type");
 const result=document.getElementById("result");
 const favList=document.getElementById("favList");
 
-const allTypes=Object.keys(foods);
 const lightTypes=["小點心","速食","便利商店","福利社"];
+const allTypes=Object.keys(foods);
 
 let favorites=JSON.parse(localStorage.getItem("favFoods")||"[]");
 
 function renderTypes(list){
-  type.innerHTML=`<option disabled selected value="">請選擇</option>`;
+  type.innerHTML='<option disabled selected value="">請選擇</option>';
   list.forEach(t=>{
     const o=document.createElement("option");
     o.textContent=t;
@@ -203,56 +191,35 @@ function renderTypes(list){
   });
 }
 
-hungry.addEventListener("change",()=>{
-  if(hungry.value==="不太餓"){
-    renderTypes(lightTypes);
-  }else{
-    renderTypes(allTypes);
-  }
-});
+hungry.onchange=()=>{
+  hungry.value==="不太餓"
+    ? renderTypes(lightTypes)
+    : renderTypes(allTypes);
+};
 
 document.getElementById("decideBtn").onclick=()=>{
-  if(!type.value){
-    result.textContent="請先選擇類型";
-    return;
-  }
-  const list=foods[type.value];
-  const pick=list[Math.floor(Math.random()*list.length)];
-  result.innerHTML=`😋 ${pick}<br><button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
-  result.classList.remove("fade");
-  void result.offsetWidth;
+  if(!type.value){result.textContent="請先選擇類型";return;}
+  const pick=foods[type.value][Math.floor(Math.random()*foods[type.value].length)];
+  result.innerHTML=`
+    <img src="${typeImg[type.value]}">
+    <div>😋 ${pick}</div>
+    <button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>
+  `;
   result.classList.add("fade");
 };
 
 function renderFavs(){
-  if(favorites.length===0){
-    favList.textContent="尚無收藏";
-    return;
-  }
-  favList.innerHTML="";
+  favList.innerHTML=favorites.length?"":"尚無收藏";
   favorites.forEach((f,i)=>{
     const d=document.createElement("div");
     d.className="item";
-    d.textContent=f;
-    const b=document.createElement("button");
-    b.textContent="移除";
-    b.className="favBtn";
-    b.onclick=()=>{favorites.splice(i,1);saveFavs();renderFavs();}
-    d.appendChild(b);
+    d.innerHTML=`${f}<button class="favBtn" onclick="removeFav(${i})">移除</button>`;
     favList.appendChild(d);
   });
 }
-
-function saveFavs(){
-  localStorage.setItem("favFoods",JSON.stringify(favorites));
-}
-
-window.addFav=(n)=>{
-  if(!favorites.includes(n)) favorites.push(n);
-  saveFavs();
-  renderFavs();
-};
-
+function addFav(f){if(!favorites.includes(f))favorites.push(f);save();}
+function removeFav(i){favorites.splice(i,1);save();}
+function save(){localStorage.setItem("favFoods",JSON.stringify(favorites));renderFavs();}
 renderFavs();
 </script>
 </body>
