@@ -9,7 +9,6 @@
 <style>
 :root{
   --main:#ff7a59;
-  --bg:#fff3ea;
   --card:#ffffff;
   --soft:#fff7f1;
   --border:#ffd8bd;
@@ -65,17 +64,13 @@ select{
   background:var(--soft);
   border:1px dashed var(--border);
   text-align:center;
+  font-size:20px;
+  font-weight:700;
 }
 
-.result img{
-  width:120px;
-  height:120px;
-  object-fit:cover;
-  border-radius:14px;
-  margin-bottom:10px;
+.fade{
+  animation:fadeIn .3s ease;
 }
-
-.fade{animation:fadeIn .3s ease}
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(6px)}
   to{opacity:1}
@@ -139,26 +134,27 @@ select{
 
 <script>
 const foods={
-  "中式":["三商巧福","陽春麵","八方雲集","便當"],
-  "日式":["壽司","拉麵","咖哩飯","丼飯"],
-  "韓式":["石鍋拌飯","韓式炸雞","辣炒年糕"],
-  "小點心":["蔥抓餅","地瓜球","鬆餅","肉圓"],
-  "火鍋":["石二鍋","三媽","老先覺"],
-  "速食":["麥當勞","肯德基","漢堡王"],
-  "便利商店":["御飯糰","關東煮","泡麵"],
-  "福利社":["便當","泡麵","茶葉蛋"]
+  "中式":["三商巧福","陽春麵","八方雲集","便當","鍋燒意麵","炒飯","鐵板麵","冬粉"],
+  "日式":["壽司","拉麵","炸豬排","咖哩飯","丼飯","烏龍麵"],
+  "韓式":["石鍋拌飯","部隊鍋","韓式炸雞","辣炒年糕","海鮮煎餅"],
+  "小點心":["蔥抓餅","地瓜球","鬆餅","披薩","肉圓"],
+  "火鍋":["這一小鍋","石二鍋","老先覺","老上海","三媽"],
+  "速食":["肯德基","麥當勞","漢堡王","摩斯漢堡"],
+  "便利商店":["御飯糰","微波","關東煮","三明治","沙拉","蒸地瓜","泡麵"],
+  "飲料":["麻古","八曜","50嵐","一沐日","鶴茶樓","可不可","五桐號"],
+  "福利社":["便當","泡麵","關東煮","義大利麵","茶葉蛋","飯捲"]
 };
 
-// 類型對應圖片
-const typeImg={
-  "中式":"https://images.unsplash.com/photo-1604908177522-429d6cfd6e64",
-  "日式":"https://images.unsplash.com/photo-1546069901-eacef0df6022",
-  "韓式":"https://images.unsplash.com/photo-1604908812566-31c8d4dca1fd",
-  "小點心":"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0",
-  "火鍋":"https://images.unsplash.com/photo-1585032226651-759b368d7246",
-  "速食":"https://images.unsplash.com/photo-1550547660-d9450f859349",
-  "便利商店":"https://images.unsplash.com/photo-1604909053191-04f61b2f10d4",
-  "福利社":"https://images.unsplash.com/photo-1504674900247-0877df9cc836"
+const typeIcon={
+  "中式":"🍚",
+  "日式":"🍣",
+  "韓式":"🍲",
+  "小點心":"🍡",
+  "火鍋":"🍲",
+  "速食":"🍔",
+  "便利商店":"🏪",
+  "飲料":"🥤",
+  "福利社":"🏫"
 };
 
 const hungry=document.getElementById("hungry");
@@ -187,28 +183,48 @@ hungry.onchange=()=>{
 };
 
 document.getElementById("decideBtn").onclick=()=>{
-  if(!type.value){result.textContent="請先選擇類型";return;}
-  const pick=foods[type.value][Math.floor(Math.random()*foods[type.value].length)];
-  result.innerHTML=`
-    <img src="${typeImg[type.value]}">
-    <div>😋 ${pick}</div>
-    <button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>
-  `;
+  if(!type.value){
+    result.textContent="請先選擇類型";
+    return;
+  }
+  const list=foods[type.value];
+  const pick=list[Math.floor(Math.random()*list.length)];
+  result.innerHTML=
+    `${typeIcon[type.value]} ${pick}
+     <br><button class="favBtn" onclick="addFav('${pick}')">加入收藏</button>`;
+  result.classList.remove("fade");
+  void result.offsetWidth;
   result.classList.add("fade");
 };
 
 function renderFavs(){
-  favList.innerHTML=favorites.length?"":"尚無收藏";
+  if(favorites.length===0){
+    favList.textContent="尚無收藏";
+    return;
+  }
+  favList.innerHTML="";
   favorites.forEach((f,i)=>{
     const d=document.createElement("div");
     d.className="item";
-    d.innerHTML=`${f}<button class="favBtn" onclick="removeFav(${i})">移除</button>`;
+    d.innerHTML=`${f}
+      <button class="favBtn" onclick="removeFav(${i})">移除</button>`;
     favList.appendChild(d);
   });
 }
-function addFav(f){if(!favorites.includes(f))favorites.push(f);save();}
-function removeFav(i){favorites.splice(i,1);save();}
-function save(){localStorage.setItem("favFoods",JSON.stringify(favorites));renderFavs();}
+
+function addFav(f){
+  if(!favorites.includes(f)) favorites.push(f);
+  saveFavs();
+}
+function removeFav(i){
+  favorites.splice(i,1);
+  saveFavs();
+}
+function saveFavs(){
+  localStorage.setItem("favFoods",JSON.stringify(favorites));
+  renderFavs();
+}
+
 renderFavs();
 </script>
 </body>
