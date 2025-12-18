@@ -138,7 +138,35 @@ if(!favorites.includes(name)) favorites.push(name);
 saveFavs();
 renderFavs();
 }
+const hungrySelect = document.getElementById("hungry");
+const typeSelect = document.getElementById("type");
 
+// 保存原本所有類型選項
+const allTypeOptions = Array.from(typeSelect.options).map(o => o.text);
+
+// 不太餓時允許的類型
+const lightTypes = ["小點心", "速食", "便利商店", "福利社"];
+
+hungrySelect.addEventListener("change", () => {
+  const hungry = hungrySelect.value;
+
+  // 清空類型選單
+  typeSelect.innerHTML = `<option disabled selected value="">請選擇</option>`;
+
+  let typesToShow;
+
+  if (hungry === "不太餓") {
+    typesToShow = lightTypes;
+  } else {
+    typesToShow = allTypeOptions.filter(t => t !== "請選擇");
+  }
+
+  typesToShow.forEach(t => {
+    const opt = document.createElement("option");
+    opt.textContent = t;
+    typeSelect.appendChild(opt);
+  });
+});
 renderFavs();
 </script>
 </body>
